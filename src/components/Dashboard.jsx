@@ -7,6 +7,7 @@ import {
   getDisplayName, logout,
 } from '../firebaseService'
 import AddModal from './AddModal'
+import ProfilePage from './ProfilePage'
 
 export default function Dashboard({ user, onLogout, addToast }) {
   const uid = user.uid
@@ -18,6 +19,8 @@ export default function Dashboard({ user, onLogout, addToast }) {
   const [search, setSearch]     = useState('')
   const [displayName, setDisplayName] = useState(user.displayName || 'User')
   const [showModal, setShowModal] = useState(false)
+  const [showProfile, setShowProfile] = useState(false)
+  const [page, setPage] = useState('dashboard') // 'dashboard' | 'profile'
   const [loading, setLoading]   = useState(true)
 
   // Load all data on mount
@@ -63,21 +66,21 @@ export default function Dashboard({ user, onLogout, addToast }) {
           return;
         }
         const id = await addMovie(uid, name)
-        setMovies(prev => [...prev, { id, name }])
+        setMovies(prev => [{ id, name }, ...prev])
       } else if (tab === 'webseries') {
         if (series.some(s => s.name.toLowerCase() === lowerName)) {
           addToast(`"${name}" is already in your Web Series!`, 'error');
           return;
         }
         const id = await addWebseries(uid, name)
-        setSeries(prev => [...prev, { id, name }])
+        setSeries(prev => [{ id, name }, ...prev])
       } else {
         if (watchlist.some(w => w.name.toLowerCase() === lowerName)) {
           addToast(`"${name}" is already in your Watchlist!`, 'error');
           return;
         }
         const id = await addWatchlist(uid, name)
-        setWatchlist(prev => [...prev, { id, name }])
+        setWatchlist(prev => [{ id, name }, ...prev])
       }
       addToast(`✅ "${name}" added!`, 'success')
     } catch (e) {
@@ -116,6 +119,21 @@ export default function Dashboard({ user, onLogout, addToast }) {
       ? 'Your watched web series collection'
       : 'Movies and Web Series you want to watch'
 
+  // ── Profile Page ──
+  if (page === 'profile') {
+    return (
+      <ProfilePage
+        user={user}
+        displayName={displayName}
+        movies={movies}
+        series={series}
+        watchlist={watchlist}
+        onBack={() => setPage('dashboard')}
+        onLogout={handleLogout}
+      />
+    )
+  }
+
   return (
     <div className="app-layout">
       {/* ── Sidebar ── */}
@@ -127,11 +145,16 @@ export default function Dashboard({ user, onLogout, addToast }) {
 
         <div className="sidebar-divider" />
 
-        {/* Profile */}
-        <div className="profile-card">
-          <div className="profile-avatar">👤</div>
-          <div className="profile-name">{displayName}</div>
-          <div className="profile-email">{user.email}</div>
+        {/* Profile Circle Button */}
+        <div className="profile-section">
+          <button
+            className="profile-circle-btn"
+            onClick={() => setPage('profile')}
+            title="View Profile"
+          >
+            {displayName ? displayName.charAt(0).toUpperCase() : '👤'}
+          </button>
+          <span className="profile-circle-name">{displayName}</span>
         </div>
 
         <div className="nav-label">LIBRARY</div>

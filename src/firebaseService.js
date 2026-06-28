@@ -50,7 +50,7 @@ export async function addMovie(uid, name) {
 }
 
 export async function getMovies(uid) {
-  const q    = query(collection(db, 'users', uid, 'movies'), orderBy('addedAt'))
+  const q    = query(collection(db, 'users', uid, 'movies'), orderBy('addedAt', 'desc'))
   const snap = await getDocs(q)
   return snap.docs.map(d => ({ id: d.id, ...d.data() }))
 }
@@ -70,7 +70,7 @@ export async function addWatchlist(uid, name) {
 }
 
 export async function getWatchlist(uid) {
-  const q    = query(collection(db, 'users', uid, 'watchlist'), orderBy('addedAt'))
+  const q    = query(collection(db, 'users', uid, 'watchlist'), orderBy('addedAt', 'desc'))
   const snap = await getDocs(q)
   return snap.docs.map(d => ({ id: d.id, ...d.data() }))
 }
@@ -88,7 +88,7 @@ export async function addWebseries(uid, name) {
 }
 
 export async function getWebseries(uid) {
-  const q    = query(collection(db, 'users', uid, 'webseries'), orderBy('addedAt'))
+  const q    = query(collection(db, 'users', uid, 'webseries'), orderBy('addedAt', 'desc'))
   const snap = await getDocs(q)
   return snap.docs.map(d => ({ id: d.id, ...d.data() }))
 }
